@@ -47,26 +47,26 @@ class TaskManager:
             while True:
                 task = self.tasks.get()
                 if task is None:
-                    logging.info("Received None, exiting scheduler loop")
+                    #logging.info("Received None, exiting scheduler loop")
                     break
 
-                logging.info(f"Task {task.task_id} received from the queue")
+                #logging.info(f"Task {task.task_id} received from the queue")
                 if task.predecessor_id is not None:
                     predecessor_result = self.result_mapping.get(task.predecessor_id)
                     if predecessor_result.type == TaskStatus.UNSCHEDULED:
                         self.tasks.put(task)
                         time.sleep(0.1)
-                        logging.info(f"Task {task.task_id} put back to the queue due to the unscheduled predecessor task.")
+                        #logging.info(f"Task {task.task_id} put back to the queue due to the unscheduled predecessor task.")
                         continue
                     elif predecessor_result.type == TaskStatus.FAIL:
-                        logging.info(f"Task {task.task_id} skipped due to the failure of the predecessor task.")
+                        #logging.info(f"Task {task.task_id} skipped due to the failure of the predecessor task.")
                         with task.lock:
                             task.result = None
                             task.type = TaskStatus.FAIL
                         continue
 
                 predecessor_result = self.result_mapping.get(task.predecessor_id).result if task.predecessor_id else None
-                logging.info(f"Task {task.task_id} started with predecessor result {predecessor_result} from {task.predecessor_id}")
+                #logging.info(f"Task {task.task_id} started with predecessor result {predecessor_result} from {task.predecessor_id}")
                 self.executor.submit(self._execute_task, task, predecessor_result if predecessor_result else None)
                 self.tasks.task_done()  # Mark the current task as done and remove it from the queue
         except Exception as e:
@@ -74,7 +74,7 @@ class TaskManager:
 
     def _execute_task(self, task: Task, predecessor_result: Task):
         try:
-            logging.info(f"Task {task.task_id} executing")
+            #logging.info(f"Task {task.task_id} executing")
 
             result = None
             with task.lock:
@@ -83,31 +83,31 @@ class TaskManager:
                     self.result_mapping[task.task_id].result = result
                     self.result_mapping[task.task_id].type = TaskStatus.SUCCESS
                     self.result_mapping[task.task_id].timestamp = datetime.now()
-                    logging.info(f"Task {task.task_id} done with result {result}")
+                    #logging.info(f"Task {task.task_id} done with result {result}")
                 except Exception as e:
                     self.result_mapping[task.task_id].result = e
                     self.result_mapping[task.task_id].type = TaskStatus.FAIL
                     self.result_mapping[task.task_id].timestamp = datetime.now()
-                    logging.info(f"Task {task.task_id} failed with exception {e}")
+                    #logging.info(f"Task {task.task_id} failed with exception {e}")
         except Exception as e:
             logging.error(f"Exception in the task {task.task_id} {e}")
 
     def add_task(self, task_id, function, predecessor_id=None):
         try:
-            logging.info(f"Adding task {task_id} with predecessor {predecessor_id}")
+            #logging.info(f"Adding task {task_id} with predecessor {predecessor_id}")
             task = Task(task_id, function, predecessor_id)
             self.tasks.put(task)
             self.result_mapping[task_id] = task
-            logging.info(f"Task {task_id} added {self.result_mapping}")
+            #logging.info(f"Task {task_id} added {self.result_mapping}")
         except Exception as e:
             logging.error(f"Exception in adding task {task_id} {e}")
 
     def join(self):
         try:
-            logging.info("Joining TaskManager")
+            #logging.info("Joining TaskManager")
 
             while any(task_result.type == TaskStatus.UNSCHEDULED for task_result in self.result_mapping.values()) and not self.tasks.empty():
-                logging.info(f"Waiting for all tasks to be scheduled {self.tasks.qsize()}")
+                #logging.info(f"Waiting for all tasks to be scheduled {self.tasks.qsize()}")
                 time.sleep(0.1)
                 pass
 
@@ -134,6 +134,6 @@ class TaskManager:
             to_remove = [task_id for task_id, task in self.result_mapping.items() if task.type in [TaskStatus.SUCCESS, TaskStatus.FAIL] and task.timestamp and now - task.timestamp > timedelta(seconds=delta)]
             for task_id in to_remove:
                 self.result_mapping.pop(task_id, None)
-                logging.info(f"Task {task_id} pruned due to age")
+                #logging.info(f"Task {task_id} pruned due to age")
         except Exception as e:
             logging.error(f"Exception in pruning old tasks {e}")

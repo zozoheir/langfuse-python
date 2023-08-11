@@ -6,7 +6,7 @@ from langfuse.task_manager import TaskManager, TaskStatus
 
 # def test_task_manager_loop():
 #     def my_task(prev_result):
-#         logging.info(f"my_task {prev_result}, returning {(prev_result or 1) * 2}")
+#         #logging.info(f"my_task {prev_result}, returning {(prev_result or 1) * 2}")
 #         return (prev_result or 1) * 2
 
 #     tm = TaskManager(5)
@@ -19,11 +19,11 @@ from langfuse.task_manager import TaskManager, TaskStatus
 
 def test_task_manager():
     def my_task(prev_result):
-        logging.info(f"my_task {prev_result}, returning {(prev_result or 1) * 2}")
+        #logging.info(f"my_task {prev_result}, returning {(prev_result or 1) * 2}")
         return (prev_result or 1) * 2
 
     def my_other_task(prev_result):
-        logging.info(f"my_other_task {prev_result}")
+        #logging.info(f"my_other_task {prev_result}")
         return (prev_result or 1) * 5
 
     tm = TaskManager(5)
