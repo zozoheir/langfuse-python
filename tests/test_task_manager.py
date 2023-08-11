@@ -9,11 +9,11 @@ from langfuse.task_manager import TaskManager, TaskStatus
 
 def test_task_manager():
     def my_task(prev_result):
-        logging.info(f"my_task {prev_result}, returning {(prev_result or 1) * 2}")
+        #logging.info(f"my_task {prev_result}, returning {(prev_result or 1) * 2}")
         return (prev_result or 1) * 2
 
     def my_other_task(prev_result):
-        logging.info(f"my_other_task {prev_result}")
+        #logging.info(f"my_other_task {prev_result}")
         return (prev_result or 1) * 5
 
     tm = TaskManager(5)
@@ -79,12 +79,12 @@ import logging
 from langfuse.task_manager import TaskManager  # assuming task_manager is the module name
 
 def dummy_function(result):
-    logging.info(f"dummy_function {result}")
+    #logging.info(f"dummy_function {result}")
     time.sleep(0.5)
     return 42
 
 logging.basicConfig(
-    level=logging.INFO,
+    level=#logging.info,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.StreamHandler()
